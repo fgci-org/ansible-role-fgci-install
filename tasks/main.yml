@@ -1,5 +1,12 @@
 ---
 # tasks file for ansible-role-fgci-install
 #
-    - name: install EPEL
-      yum: name=epel-release state=present
+- name: install EPEL
+  yum: name=epel-release state=present
+
+- name: creates VM disks directory
+  file: path=/etc/dhcp/dhcpd.d state=directory
+
+- name: creates nodes.conf file
+  file: path=/etc/dhcp/dhcpd.d/nodes.conf state=touch owner=root mode=0644
+
