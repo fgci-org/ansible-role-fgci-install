@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/CSC-IT-Center-for-Science/ansible-role-fgci-install.svg)](https://travis-ci.org/CSC-IT-Center-for-Science/ansible-role-fgci-install)
 ansible-role-fgci-install
 =========
 
