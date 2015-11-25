@@ -2,4 +2,4 @@
 # tasks file for ansible-role-fgci-install
 #
     - name: install EPEL
-      yum: name=epel-release state=present
+      yum: "name=epel-release state=present"
