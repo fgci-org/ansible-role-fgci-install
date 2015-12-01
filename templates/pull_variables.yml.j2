@@ -10,4 +10,4 @@ ntp_config_server: [ "{{ pull_install_ip }}", "10.1.1.1" ]
 collectd_network_server_host: "{{ pull_install_ip }}" 
 {% endraw %}
 adminMailAddr: "{{ adminMailAddr }}"
-
+slurm_service_node: "{{ hostvars[groups['slurm_service'][0]]['ansible_hostname']  }}"
