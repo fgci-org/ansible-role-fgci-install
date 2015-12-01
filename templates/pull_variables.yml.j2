@@ -11,3 +11,4 @@ collectd_network_server_host: "{{ pull_install_ip }}"
 {% endraw %}
 adminMailAddr: "{{ adminMailAddr }}"
 slurm_service_node: "{{ hostvars[groups['slurm_service'][0]]['ansible_hostname']  }}"
+slurm_munge_key_from_nfs: True
