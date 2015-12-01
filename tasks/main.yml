@@ -9,3 +9,6 @@
 
 - name: creates nodes.conf file
   file: path=/etc/dhcp/dhcpd.d/nodes.conf state=touch owner=root mode=0644
+
+- name: template in /var/www/html/pull_variables.yml
+  template: src=pull_variables.yml.j2 dest=/var/www/html/pull_variables.yml mode=0644 owner=apache group=apache backup=yes
