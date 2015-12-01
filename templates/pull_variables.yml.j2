@@ -3,11 +3,11 @@
 # 
 #
 pull_install_ip: "{{ kickstart_server_ip }}"
-pull_login_ip: "{{ http_proxy }}"
+pull_login_ip: "{{ int_gateway }}"
 
 {% raw %}
 ntp_config_server: [ "{{ pull_install_ip }}", "10.1.1.1" ]
 collectd_network_server_host: "{{ pull_install_ip }}" 
-{% raw %}
+{% endraw %}
 adminMailAddr: "{{ adminMailAddr }}"
 
