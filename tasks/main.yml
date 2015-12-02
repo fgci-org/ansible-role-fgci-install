@@ -12,3 +12,9 @@
 
 - name: template in /var/www/html/pull_variables.yml
   template: src=pull_variables.yml.j2 dest=/var/www/html/pull_variables.yml mode=0644 owner=apache group=apache backup=yes
+
+- name: copy hosts file to /var/www/html/hosts.yml - for ansible-pull
+  copy: src=hosts dest=/var/www/html/hosts mode=0644 owner=apache group=apache backup=yes
+
+- name: copy the ansible-pull-script.sh to /var/www/html/hosts.yml - for ansible-pull
+  copy: src=tools/ansible-pull-script.sh dest=/var/www/html/hosts mode=0644 owner=apache group=apache backup=yes
