@@ -1,2 +1,6 @@
 ---
 # defaults file for ansible-role-fgci-install
+# These variables come from fgci-ansible repo
+#kickstart_server_ip: "10.1.1.2"
+#int_gateway: "10.1.1.4"
+#adminMailAddr: "changeme@example.com"
