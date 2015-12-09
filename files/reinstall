@@ -1,5 +1,5 @@
 #!/bin/bash                           
-NODEDIR=/etc/cluster/nodes/           
+NODEDIR=/var/www/provision/reinstall
 
 HELP=0
 RESTART=1
@@ -15,53 +15,53 @@ usage () {
   echo "Nodenames can be either a nodename, e.g. c1, several nodenames, e.g."
   echo "c1 c3 c5, or a range (uses slurm & pdsh notation), e.g. c[1-5] or c[1-5,7] or c[1-2]-[1-3]" 
   echo "   -q      Do a quick reinstall, e.g. reboot the nodes immideately"
-  echo "   -n      Do not reinstall now, just mark reinstall for next boot"  
-  echo "   -h      Show this help"                                           
-  echo ""                                                                    
+  echo "   -n      Do not reinstall now, just mark reinstall for next boot"
+  echo "   -h      Show this help"
+  echo ""
 
 }
 
 add_node () {
  if [ "x$1" != "x" ] ; then
-  ls $NODEDIR/$1 &>/dev/null 
-  if [ $? -eq 0 ] ; then     
+  ls $NODEDIR/$1 &>/dev/null
+  if [ $? -eq 0 ] ; then
    #check that one node isn't added multiple times
-   echo $NODELIST | grep "\b$1\b" &>/dev/null     
-   if [ $? -ne 0 ] ; then                         
-    NODELIST="$NODELIST $1"                       
-   fi                                             
-   return 0                                       
-  fi                                              
- fi                                               
+   echo $NODELIST | grep "\b$1\b" &>/dev/null
+   if [ $? -ne 0 ] ; then
+    NODELIST="$NODELIST $1"
+   fi
+   return 0
+  fi
+ fi 
 
- echo $MISSINGNODES | grep "\b$1\b" &>/dev/null     
- if [ $? -ne 0 ] ; then                         
+ echo $MISSINGNODES | grep "\b$1\b" &>/dev/null
+ if [ $? -ne 0 ] ; then
   MISSINGNODES="$MISSINGNODES $1"
- fi                                             
- return 1                                         
-}                                                 
+ fi
+ return 1
+}
 
 reinstall_node () {
- touch $NODEDIR/$1/reinstall
+ touch $NODEDIR/$1
  if [ $RESTART -eq 1 ] ; then
   if [ $QUICK -eq 1 ] ; then
    ssh $1 reboot
   else
    scontrol update Nodename="$1" state=Drain reason="reboot"
-  fi 
- fi                          
-}                            
+  fi
+ fi
+}
 
 
 while getopts ":nhq" opt
-do                     
-  case $opt in         
-    h ) HELP=1 ;;      
-    n ) RESTART=0 ;;   
-    q ) QUICK=1 ;;   
-  esac                 
-done                   
-shift $(($OPTIND - 1)) 
+do
+  case $opt in
+    h ) HELP=1 ;;
+    n ) RESTART=0 ;;
+    q ) QUICK=1 ;;
+  esac
+done
+shift $(($OPTIND - 1))
 
 if [ $HELP -ne 0 ] ; then
  usage
