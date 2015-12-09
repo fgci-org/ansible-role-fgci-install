@@ -21,6 +21,7 @@
 
 - name: template the ansible-pull-script.sh to /var/www/html/hosts.yml - for ansible-pull
   template: src=tools/ansible-pull-script.sh dest=/var/www/html/ansible-pull-script.sh mode=0644 backup=yes
+  when: ansible_virtualization_type != "docker"
 
 - name: copy in reinstall script
   copy: src=reinstall dest=/usr/local/sbin/reinstall mode=0755 owner=root group=root backup=no
