@@ -7,3 +7,6 @@
 
 hosts_file_src: "hosts"
 hosts_file_dest: "/var/www/html/hosts"
+
+group_vars_src: "group_vars/"
+group_vars_dest: "/var/www/html/group_vars"

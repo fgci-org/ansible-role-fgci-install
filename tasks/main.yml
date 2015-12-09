@@ -10,14 +10,23 @@
 - name: creates nodes.conf file
   file: path=/etc/dhcp/dhcpd.d/nodes.conf state=touch owner=root mode=0644
 
-- name: create /var/www/html directory
-  file: path=/var/www/html state=directory
+- name: create group_vars_dest directory - /var/www/html/group_vars by default
+  file: path={{ group_vars_dest }} state=directory
 
 - name: template in /var/www/html/pull_variables.yml
   template: src=pull_variables.yml.j2 dest=/var/www/html/pull_variables.yml mode=0644 backup=yes
 
 - name: copy hosts file to /var/www/html/hosts.yml - for ansible-pull
   copy: src={{ hosts_file_src }} dest={{ hosts_file_dest }} mode=0644 backup=yes
+
+- name: synchronize group_vars/ to /var/www/html/group_vars/ - for ansible-pull - secrets and firewalls are not needed
+  synchronize: src={{ group_vars_src }} 
+                dest={{ group_vars_dest }}/{{ item }} 
+                archive=yes
+                recursive=yes
+                --exclude=secrets.yml
+                --exclude=trusted_networks.yml
+  when: ansible_virtualization_type != "docker"
 
 - name: template the ansible-pull-script.sh to /var/www/html/hosts.yml - for ansible-pull
   template: src=tools/ansible-pull-script.sh dest=/var/www/html/ansible-pull-script.sh mode=0644 backup=yes
