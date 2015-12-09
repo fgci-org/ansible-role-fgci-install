@@ -23,8 +23,13 @@
   synchronize:
                 src: "{{ group_vars_src }}"
                 dest: "{{ group_vars_dest }}"
-                archive: yes
+                archive: no
                 recursive: yes
+                times: no
+                set_remote_user: yes
+                perms: no
+                owner: no
+                group: no
                 rsync_opts:
                  - '--exclude=secrets.yml'
                  - '--exclude=trusted_networks.yml'
