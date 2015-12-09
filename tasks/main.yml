@@ -17,7 +17,7 @@
   template: src=pull_variables.yml.j2 dest=/var/www/html/pull_variables.yml mode=0644 backup=yes
 
 - name: copy hosts file to /var/www/html/hosts.yml - for ansible-pull
-  copy: src=hosts dest=/var/www/html/hosts mode=0644 backup=yes
+  copy: src={{ hosts_file_src }} dest={{ hosts_file_dest }} mode=0644 backup=yes
 
 - name: template the ansible-pull-script.sh to /var/www/html/hosts.yml - for ansible-pull
   template: src=tools/ansible-pull-script.sh dest=/var/www/html/ansible-pull-script.sh mode=0644 backup=yes

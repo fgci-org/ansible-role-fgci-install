@@ -4,3 +4,6 @@
 #kickstart_server_ip: "10.1.1.2"
 #int_gateway: "10.1.1.4"
 #adminMailAddr: "changeme@example.com"
+
+hosts_file_src: "hosts"
+hosts_file_dest: "/var/www/html/hosts"
