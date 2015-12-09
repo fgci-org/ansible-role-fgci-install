@@ -1,0 +1,179 @@
+#!/bin/bash                           
+NODEDIR=/etc/cluster/nodes/           
+
+HELP=0
+RESTART=1
+QUICK=0
+NODELIST=""
+MISSINGNODES=""
+
+usage () {
+  echo "" 
+  echo "reinstall [-n] [-q] [-h] <nodenames>"
+  echo "The reinstall command reinstalls one or several compute nodes."
+  echo "By default this command drains the node in SLURM, and it's reinstalled when drained."
+  echo "Nodenames can be either a nodename, e.g. c1, several nodenames, e.g."
+  echo "c1 c3 c5, or a range (uses slurm & pdsh notation), e.g. c[1-5] or c[1-5,7] or c[1-2]-[1-3]" 
+  echo "   -q      Do a quick reinstall, e.g. reboot the nodes immideately"
+  echo "   -n      Do not reinstall now, just mark reinstall for next boot"  
+  echo "   -h      Show this help"                                           
+  echo ""                                                                    
+
+}
+
+add_node () {
+ if [ "x$1" != "x" ] ; then
+  ls $NODEDIR/$1 &>/dev/null 
+  if [ $? -eq 0 ] ; then     
+   #check that one node isn't added multiple times
+   echo $NODELIST | grep "\b$1\b" &>/dev/null     
+   if [ $? -ne 0 ] ; then                         
+    NODELIST="$NODELIST $1"                       
+   fi                                             
+   return 0                                       
+  fi                                              
+ fi                                               
+
+ echo $MISSINGNODES | grep "\b$1\b" &>/dev/null     
+ if [ $? -ne 0 ] ; then                         
+  MISSINGNODES="$MISSINGNODES $1"
+ fi                                             
+ return 1                                         
+}                                                 
+
+reinstall_node () {
+ touch $NODEDIR/$1/reinstall
+ if [ $RESTART -eq 1 ] ; then
+  if [ $QUICK -eq 1 ] ; then
+   ssh $1 reboot
+  else
+   scontrol update Nodename="$1" state=Drain reason="reboot"
+  fi 
+ fi                          
+}                            
+
+
+while getopts ":nhq" opt
+do                     
+  case $opt in         
+    h ) HELP=1 ;;      
+    n ) RESTART=0 ;;   
+    q ) QUICK=1 ;;   
+  esac                 
+done                   
+shift $(($OPTIND - 1)) 
+
+if [ $HELP -ne 0 ] ; then
+ usage
+ exit
+fi
+
+addlist=""
+
+for node in "$@"; do
+ #check if we have a node range
+ # This supports following node range formats
+ # compute[1-3] compute[1,3] compute[1-3,4]
+ # compute-[1-3]-node compute[1-3]-rack-[1-2]
+ # compute-[1-3]-rack[1-2]-gpu
+ begin=`echo $node | grep -o "^[^\[\]*"`
+ mid=`echo $node | sed -e "s/^[^]]*]\([^[]*\).*/\1/"`
+ end=`echo $node |  grep -o "[^]]*$"`
+ first_range=`echo $node | grep -o -m1 "\[[0-9,-]*\]" | sed -e "s/\[//" -e "s/\]//" -e "s/,/\ /g" |head -n1`
+ second_range=`echo $node | grep -o -m1 "\[[0-9,-]*\]" | sed -e "s/\[//" -e "s/\]//" -e "s/,/\ /g" |tail -n +2`
+ tmplist=""
+
+ 
+ if [ "x$first_range" != "x" ] ; then
+  # if we do try to add all nodes
+  # we have one range
+  for i in $first_range ; do
+   echo $i | grep -e "-" &>/dev/null
+   if [ $? -eq 0 ] ; then
+    r_start=`echo $i | sed -e "s/\(^[^-]*\).*/\1/"`
+    r_end=`echo $i | sed -e "s/^[^-]*-\(.*\)/\1/"`
+
+    #check for leading zeroes in the start nubmer
+    echo $r_start |grep "^0" &>/dev/null
+    if [ $? -eq 0 ] ; then
+     seqlist=`seq -w $r_start $r_end`
+    else
+     seqlist=`seq $r_start $r_end`
+    fi
+    for num in $seqlist ; do
+     tmplist=$tmplist" $begin$num"
+    done
+   else
+     tmplist=$tmplist" $begin$i"
+   fi
+  done
+  if [ "x$second_range" != "x" ]; then
+   # we have two ranges, more work
+   for i in $second_range; do
+    echo $i | grep -e "-" &>/dev/null
+    if [ $? -eq 0 ] ; then
+     r_start=`echo $i | sed -e "s/\(^[^-]*\).*/\1/"`
+     r_end=`echo $i | sed -e "s/^[^-]*-\(.*\)/\1/"`
+
+     #check for leading zeroes in the start nubmer
+     echo $r_start |grep "^0" &>/dev/null
+     if [ $? -eq 0 ] ; then
+      seqlist=`seq -w $r_start $r_end`
+     else
+      seqlist=`seq $r_start $r_end`
+     fi
+     for num in $seqlist ; do
+      for nod in $tmplist ; do 
+       addlist=$addlist" $nod$mid$num$end"
+      done
+     done
+    else
+      for nod in $tmplist ; do 
+       addlist=$addlist" $nod$mid$i$end"
+      done
+    fi
+   done
+  else
+   #Only one range, add endings
+   for nod in $tmplist ; do 
+    addlist=$addlist" $nod$end"
+   done
+  fi
+ else
+  #No node ranges, just a node
+  addlist=$addlist" $begin"
+ fi
+done
+
+#add nodes to templist
+for node in $addlist ; do
+  add_node $node
+done
+
+if [ "x$MISSINGNODES" != "x" ] ; then
+ echo "The following nodes were not found and will be ignored"
+ echo "$MISSINGNODES"
+fi
+
+if [ "x$NODELIST" == "x" ] ; then
+ echo "No reinstallable nodes found"
+ exit
+fi
+
+if [ $QUICK -eq 1 ] && [ $RESTART -eq 1 ]  ; then
+ echo "The following nodes will be reinstalled immideately."
+ echo "$NODELIST"
+ echo -n "Are you sure you want to proceed? [y/N] "
+ read rest
+ if [ x"$rest" == "xY" ] || [ x"$rest" == "xy" ] ; then
+  echo "Reinstalling nodes now"
+ else
+  echo "Aborting reinstall"
+  exit 1
+ fi
+fi
+
+for node in $NODELIST; do
+ reinstall_node $node
+done
+
