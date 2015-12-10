@@ -4,6 +4,7 @@
 #
 pull_install_ip: "{{ kickstart_server_ip }}"
 pull_login_ip: "{{ int_gateway }}"
+running_as_ansible_pull: True
 
 {% raw %}
 ntp_config_server: [ "{{ pull_install_ip }}", "10.1.1.1" ]
