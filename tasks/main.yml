@@ -4,6 +4,10 @@
 - name: install EPEL
   yum: name=epel-release state=present
 
+- name: Install FGCI repo
+  yum: pkg=http://idris.fgi.csc.fi/fgci7/x86_64/fgci/rpms/fgci-release7-1-1.el7.noarch.rpm
+  when: ansible_distribution_major_version == "7"
+
 - name: create dhcp.d directory
   file: path=/etc/dhcp/dhcpd.d state=directory
 
