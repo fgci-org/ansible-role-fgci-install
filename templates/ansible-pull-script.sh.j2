@@ -15,6 +15,9 @@ export no_proxy="localhost,{{ pull_install_ip }},raw.githubusercontent.com"
 mkdir -p /root/.ansible/pull/$HOSTNAME
 cd /root/.ansible/pull/$HOSTNAME
 
+#Bring Up Ib0
+/usr/sbin/ifup ib0
+
 # Clone or update the fgci-ansible repo
 if [ ! -d ".git" ]; then
 /usr/bin/git clone https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git .
@@ -54,6 +57,3 @@ $loggercmd "info: ansible-pull -s 10 -U https://github.com/CSC-IT-Center-for-Sci
 if [ "$?" != 0 ]; then
         $loggercmd "error: ansible -i /root/hosts -m get_url -a 'url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/' localhost failed with rc=$?"
 fi
-
-#Bring Up Ib0
-/usr/sbin/ifup ib0
