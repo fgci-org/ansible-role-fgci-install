@@ -54,3 +54,6 @@ $loggercmd "info: ansible-pull -s 10 -U https://github.com/CSC-IT-Center-for-Sci
 if [ "$?" != 0 ]; then
         $loggercmd "error: ansible -i /root/hosts -m get_url -a 'url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/' localhost failed with rc=$?"
 fi
+
+#Bring Up Ib0
+/usr/sbin/ifup ib0
