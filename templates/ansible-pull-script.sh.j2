@@ -53,7 +53,7 @@ fi
 $loggercmd "info: ansible-pull -s 10 -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
 
 # Grab the latest ansible-pull-script.sh
-/usr/bin/ansible -i /root/hosts -m get_url -a "url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/" localhost
+/usr/bin/ansible -i /root/hosts -m get_url -a "url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/ mode=0755" localhost
 if [ "$?" != 0 ]; then
         $loggercmd "error: ansible -i /root/hosts -m get_url -a 'url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/' localhost failed with rc=$?"
 fi
