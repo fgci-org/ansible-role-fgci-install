@@ -11,6 +11,7 @@ loggercmd="/usr/bin/logger -s -t ansible-pull"
 export http_proxy="http://{{ int_gateway }}:3128"
 export https_proxy=$http_proxy
 export no_proxy="localhost,{{ pull_install_ip }},raw.githubusercontent.com"
+time=$[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]
 # Setup the ansible-pull fgci work dir
 mkdir -p /root/.ansible/pull/$HOSTNAME
 cd /root/.ansible/pull/$HOSTNAME
@@ -19,7 +20,7 @@ cd /root/.ansible/pull/$HOSTNAME
 /usr/sbin/ifup ib0
 
 # Sleep a bit
-/bin/sleep $[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]s
+/bin/sleep "$time"s
 
 # Clone or update the fgci-ansible repo
 if [ ! -d ".git" ]; then
@@ -37,7 +38,7 @@ fi
 
 # Mirror in the group_vars - they are copied to install node's www with the fgci-install tag and role for install node.
 # Wget assumes we are in $HOME/.ansible/pull/$HOSTNAME when running
-/usr/bin/wget --random-wait 5 --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
+/usr/bin/wget --random-wait $time --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
 
 # Install all the ansible role dependencies
 /usr/bin/ansible-galaxy install -r requirements.yml -f -i
@@ -52,11 +53,12 @@ if [ "$?" != 0 ]; then
 fi
 
 # customizable random delay in seconds, fgci-ansible/local.yml playbook, master branch and /root/hosts inventory file
-/usr/bin/ansible-pull -s 10 -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
-$loggercmd "info: ansible-pull -s 10 -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
+/usr/bin/ansible-pull -s $time -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
+$loggercmd "info: ansible-pull -s $time -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
 
 # Grab the latest ansible-pull-script.sh
 /usr/bin/ansible -i /root/hosts -m get_url -a "url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/ mode=0755" localhost
 if [ "$?" != 0 ]; then
         $loggercmd "error: ansible -i /root/hosts -m get_url -a 'url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/' localhost failed with rc=$?"
 fi
+
