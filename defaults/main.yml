@@ -10,3 +10,6 @@ hosts_file_dest: "/var/www/html/hosts"
 
 group_vars_src: "group_vars/"
 group_vars_dest: "/var/www/html/group_vars"
+
+int_gateway: "10.1.1.4"
+pull_install_ip: "10.1.1.2"
