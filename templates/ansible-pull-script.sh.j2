@@ -15,8 +15,11 @@ export no_proxy="localhost,{{ pull_install_ip }},raw.githubusercontent.com"
 mkdir -p /root/.ansible/pull/$HOSTNAME
 cd /root/.ansible/pull/$HOSTNAME
 
-#Bring Up Ib0
+# Bring Up Ib0
 /usr/sbin/ifup ib0
+
+# Sleep a bit
+/bin/sleep $[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]s
 
 # Clone or update the fgci-ansible repo
 if [ ! -d ".git" ]; then
