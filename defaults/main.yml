@@ -12,6 +12,7 @@ group_vars_src: "group_vars/"
 group_vars_dest: "/var/www/html/group_vars"
 
 ansible_pull_sleep: "10"
+ansible_pull_branch: "production"
 
 int_gateway: "10.1.1.4"
 pull_install_ip: "10.1.1.2"
