@@ -15,3 +15,6 @@ ansible_pull_sleep: "10"
 
 int_gateway: "10.1.1.4"
 pull_install_ip: "10.1.1.2"
+
+# Set fgci_node_type to service or compute. Default to compute if nothing is set.
+fgci_node_type: "{{ slurm_type | default("compute") }}"

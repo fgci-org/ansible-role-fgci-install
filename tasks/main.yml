@@ -1,43 +1,10 @@
 ---
 # tasks file for ansible-role-fgci-install
 #
-- name: install EPEL
-  yum: name=epel-release state=present
+# service.yml - the node that runs dhcpd
+ - include: service.yml
+   when: fgci_node_type == "service"
 
-- name: create dhcp.d directory
-  file: path=/etc/dhcp/dhcpd.d state=directory
-
-- name: creates nodes.conf file
-  file: path=/etc/dhcp/dhcpd.d/nodes.conf state=touch owner=root mode=0644
-
-- name: create group_vars_dest directory - /var/www/html/group_vars by default
-  file: path={{ group_vars_dest }} state=directory
-
-- name: template in /var/www/html/pull_variables.yml
-  template: src=pull_variables.yml.j2 dest=/var/www/html/pull_variables.yml mode=0644 backup=yes
-
-- name: copy hosts file to /var/www/html/hosts.yml - for ansible-pull
-  copy: src={{ hosts_file_src }} dest={{ hosts_file_dest }} mode=0644 backup=yes
-
-- name: synchronize group_vars/ to /var/www/html/group_vars/ - for ansible-pull - secrets and firewalls are not needed
-  synchronize:
-                src: "{{ group_vars_src }}"
-                dest: "{{ group_vars_dest }}"
-                archive: no
-                recursive: yes
-                times: no
-                set_remote_user: yes
-                perms: no
-                owner: no
-                group: no
-                rsync_opts:
-                 - '--exclude=secrets.yml'
-                 - '--exclude=trusted_networks.yml'
-  when: ansible_virtualization_type != "docker"
-
-- name: template the ansible-pull-script.sh to /var/www/html/hosts.yml - for ansible-pull
-  template: src=ansible-pull-script.sh.j2 dest=/var/www/html/ansible-pull-script.sh mode=0644 backup=yes
-  when: ansible_virtualization_type != "docker"
-
-- name: copy in reinstall script
-  copy: src=reinstall dest=/usr/local/sbin/reinstall mode=0755 owner=root group=root backup=no
+# compute.yml - the node that runs ansible-pull
+ - include: compute.yml
+   when: fgci_node_type == "compute"

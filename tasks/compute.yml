@@ -1,0 +1,6 @@
+---
+# tasks file for ansible-role-fgci-install
+#
+
+- name: template the ansible-pull-script.sh to /usr/local/bin
+  template: src=ansible-pull-script.sh.j2 dest=/usr/local/bin/ansible-pull-script.sh mode=0755 backup=no
