@@ -12,9 +12,22 @@ export http_proxy="http://{{ int_gateway }}:3128"
 export https_proxy=$http_proxy
 export no_proxy="localhost,{{ pull_install_ip }},raw.githubusercontent.com"
 time=$[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]
+lockdir="/var/lock/ansible-pull"
+
 # Setup the ansible-pull fgci work dir
 mkdir -p /root/.ansible/pull/$HOSTNAME
 cd /root/.ansible/pull/$HOSTNAME
+
+## One ansible-pull at a time
+if mkdir "$lockdir"
+then
+        LOCK="1" # and the script continues
+else
+        $loggercmd "cannot acquire lock, giving up on $lockdir"
+        LOCK="0"
+        exit 1
+fi
+##
 
 # Bring Up Ib0
 /usr/sbin/ifup ib0
@@ -56,9 +69,11 @@ fi
 /usr/bin/ansible-pull -s $time -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
 $loggercmd "info: ansible-pull -s $time -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
 
+# Remove lockdir when we are done but before we update ourselves.
+rmdir $lockdir
+
 # Grab the latest ansible-pull-script.sh
 /usr/bin/ansible -i /root/hosts -m get_url -a "url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/ mode=0755" localhost
 if [ "$?" != 0 ]; then
         $loggercmd "error: ansible -i /root/hosts -m get_url -a 'url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/' localhost failed with rc=$?"
 fi
-
