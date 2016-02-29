@@ -41,3 +41,16 @@
 
 - name: copy in reinstall script
   copy: src=reinstall dest=/usr/local/sbin/reinstall mode=0755 owner=root group=root backup=no
+
+- name: Copy requirements.yml
+  copy: src={{ playbook_dir }}/requirements.yml dest=/tmp/requirements.yml
+
+- name: Copy gitmirror config generation tool
+  copy: src={{ playbook_dir }}/tools/gitmirror_conf_generate.py dest=/tmp/gitmirror_conf_generate.py
+
+- name: Run gitmirror config generation tool
+  command: python /tmp/gitmirror_conf_generate.py /tmp/requirements.yml {{ pull_install_ip }} /var/www/html/requirements_mirror.yml /etc/gitmirror.toml
+
+- name: Bounce gitmirror service, but do not fail if it does not exist yet
+  service: name=gitmirror state=restarted
+  ignore_errors: yes

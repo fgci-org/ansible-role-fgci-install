@@ -37,9 +37,9 @@ fi
 
 # Clone or update the fgci-ansible repo
 if [ ! -d ".git" ]; then
-/usr/bin/git clone https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git .
+/usr/bin/git clone http://{{ pull_install_ip }}/github.com/CSC-IT-Center-for-Science/fgci-ansible.git .
 if [ "$?" != 0 ]; then
-        $loggercmd "error: with 'git clone https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git .' PWD=$PWD rc=$?"
+        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}/github.com/CSC-IT-Center-for-Science/fgci-ansible.git .' PWD=$PWD rc=$?"
 fi
 else
 # If the .git directory exists then only run git pull
@@ -54,7 +54,8 @@ fi
 /usr/bin/wget --random-wait $time --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
 
 # Install all the ansible role dependencies
-/usr/bin/ansible-galaxy install -r requirements.yml -f -i
+/usr/bin/curl -O http://{{ pull_install_ip }}/requirements_mirror.yml
+/usr/bin/ansible-galaxy install -r requirements_mirror.yml -f -i
 if [ "$?" != 0 ]; then
         $loggercmd "error: installing ansible requirements rc=$?"
 fi
@@ -66,8 +67,8 @@ if [ "$?" != 0 ]; then
 fi
 
 # customizable random delay in seconds, fgci-ansible/local.yml playbook, master branch and /root/hosts inventory file
-/usr/bin/ansible-pull -s $time -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
-$loggercmd "info: ansible-pull -s $time -U https://github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
+/usr/bin/ansible-pull -s $time -U http://{{ pull_install_ip }}/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
+$loggercmd "info: ansible-pull -s $time -U https://{{ pull_install_ip }}/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
 
 # Remove lockdir when we are done but before we update ourselves.
 rmdir $lockdir
