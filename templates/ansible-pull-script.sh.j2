@@ -36,11 +36,15 @@ fi
 /bin/sleep "$time"s
 
 # Clone or update the fgci-ansible repo
-if [ ! -d ".git" ]; then
-/usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git .
+git config --get remote.origin.url |grep {{ pull_install_ip }} >/dev/null
+if [ "$?" != 0 ]; then
+    cd ..
+    rm -rf $HOSTNAME
+    /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $HOSTNAME
 if [ "$?" != 0 ]; then
         $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git .' PWD=$PWD rc=$?"
 fi
+    cd $HOSTNAME
 else
 # If the .git directory exists then only run git pull
 /usr/bin/git pull
