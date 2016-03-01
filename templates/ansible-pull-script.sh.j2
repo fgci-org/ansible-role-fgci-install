@@ -42,7 +42,7 @@ if [ "$?" != 0 ]; then
     rm -rf $HOSTNAME
     /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $HOSTNAME
 if [ "$?" != 0 ]; then
-        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git .' PWD=$PWD rc=$?"
+        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $HOSTNAME' PWD=$PWD rc=$?"
 fi
     cd $HOSTNAME
 else
