@@ -13,10 +13,11 @@ export https_proxy=$http_proxy
 export no_proxy="localhost,{{ pull_install_ip }},raw.githubusercontent.com"
 time=$[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]
 lockdir="/var/lock/ansible-pull"
+SHOSTNAME=$(hostname -s)
 
 # Setup the ansible-pull fgci work dir
-mkdir -p /root/.ansible/pull/$HOSTNAME
-cd /root/.ansible/pull/$HOSTNAME
+mkdir -p /root/.ansible/pull/$SHOSTNAME
+cd /root/.ansible/pull/$SHOSTNAME
 
 ## One ansible-pull at a time
 if ! mkdir "$lockdir"; then
@@ -35,12 +36,12 @@ fi
 git config --get remote.origin.url |grep {{ pull_install_ip }} >/dev/null
 if [ "$?" != 0 ]; then
     cd ..
-    rm -rf $HOSTNAME
-    /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $HOSTNAME
+    rm -rf $(hostname -s)
+    /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $SHOSTNAME
 if [ "$?" != 0 ]; then
-        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $HOSTNAME' PWD=$PWD rc=$?"
+        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $SHOSTNAME' PWD=$PWD rc=$?"
 fi
-    cd $HOSTNAME
+    cd $SHOSTNAME
 else
 # If the .git directory exists then only run git pull
 /usr/bin/git pull
@@ -50,7 +51,7 @@ fi
 fi
 
 # Mirror in the group_vars - they are copied to install node's www with the fgci-install tag and role for install node.
-# Wget assumes we are in $HOME/.ansible/pull/$HOSTNAME when running
+# Wget assumes we are in $HOME/.ansible/pull/$SHOSTNAME when running
 /usr/bin/wget --random-wait $time --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
 
 # Install all the ansible role dependencies
