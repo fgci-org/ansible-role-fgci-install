@@ -19,12 +19,8 @@ mkdir -p /root/.ansible/pull/$HOSTNAME
 cd /root/.ansible/pull/$HOSTNAME
 
 ## One ansible-pull at a time
-if mkdir "$lockdir"
-then
-        LOCK="1" # and the script continues
-else
+if ! mkdir "$lockdir"; then
         $loggercmd "cannot acquire lock, giving up on $lockdir"
-        LOCK="0"
         exit 1
 fi
 ##
@@ -58,14 +54,14 @@ fi
 /usr/bin/wget --random-wait $time --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
 
 # Install all the ansible role dependencies
-/usr/bin/curl -O http://{{ pull_install_ip }}/requirements_mirror.yml
+/usr/bin/curl -f -O http://{{ pull_install_ip }}/requirements_mirror.yml
 /usr/bin/ansible-galaxy install -r requirements_mirror.yml -f -i
 if [ "$?" != 0 ]; then
         $loggercmd "error: installing ansible requirements rc=$?"
 fi
 
 # Get the ansible hosts file 
-/usr/bin/curl http://{{ pull_install_ip }}/hosts > /root/hosts
+/usr/bin/curl -f -o /root/hosts http://{{ pull_install_ip }}/hosts
 if [ "$?" != 0 ]; then
         $loggercmd "error: curling http://{{ pull_install_ip }}/hosts rc=$?"
 fi
@@ -78,7 +74,8 @@ $loggercmd "info: ansible-pull -s $time -U https://{{ pull_install_ip }}:8080/gi
 rmdir $lockdir
 
 # Grab the latest ansible-pull-script.sh
-/usr/bin/ansible -i /root/hosts -m get_url -a "url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/ mode=0755" localhost
+/usr/bin/curl -f -o /usr/local/bin/ansible-pull-script.sh http://{{ pull_install_ip }}/ansible-pull-script.sh
 if [ "$?" != 0 ]; then
-        $loggercmd "error: ansible -i /root/hosts -m get_url -a 'url=http://{{ pull_install_ip }}/ansible-pull-script.sh dest=/usr/local/bin/' localhost failed with rc=$?"
+        $loggercmd "error: curl -f -o /usr/local/bin/ansible-pull-script.sh http://{{ pull_install_ip }}/ansible-pull-script.sh failed with rc=$?"
 fi
+chmod 0750 /usr/local/bin/ansible-pull-script.sh
