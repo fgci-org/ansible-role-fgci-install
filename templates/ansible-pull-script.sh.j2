@@ -15,6 +15,20 @@ time=$[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]
 lockdir="/var/lock/ansible-pull"
 SHOSTNAME=$(hostname -s)
 
+# Command line option handling. Only -n (= no sleep, useful for
+# interactive use) is supported so far.
+while getopts ":n" opt; do
+    case $opt in
+	n)
+            time=0
+	    ;;
+	\?)
+	    echo "Invalid option: -$OPTARG" >&2
+	    ;;
+    esac
+done
+
+
 # Setup the ansible-pull fgci work dir
 mkdir -p /root/.ansible/pull/$SHOSTNAME
 cd /root/.ansible/pull/$SHOSTNAME
@@ -52,7 +66,7 @@ fi
 
 # Mirror in the group_vars - they are copied to install node's www with the fgci-install tag and role for install node.
 # Wget assumes we are in $HOME/.ansible/pull/$SHOSTNAME when running
-/usr/bin/wget --random-wait $time --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
+/usr/bin/wget --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
 
 # Install all the ansible role dependencies
 /usr/bin/curl -f -O http://{{ pull_install_ip }}/requirements_mirror.yml
@@ -68,8 +82,8 @@ if [ "$?" != 0 ]; then
 fi
 
 # customizable random delay in seconds, fgci-ansible/local.yml playbook, master branch and /root/hosts inventory file
-/usr/bin/ansible-pull -s $time -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
-$loggercmd "info: ansible-pull -s $time -U https://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
+/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
+$loggercmd "info: ansible-pull -U https://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
 
 # Remove lockdir when we are done but before we update ourselves.
 rmdir $lockdir
