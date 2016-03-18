@@ -70,6 +70,9 @@ fi
 
 # Install all the ansible role dependencies
 /usr/bin/curl -f -O http://{{ pull_install_ip }}/requirements_mirror.yml
+if [ "$?" != 0 ]; then
+        $loggercmd "error: curling http://{{ pull_install_ip }}/requirements_mirror.yml rc=$?"
+fi
 /usr/bin/ansible-galaxy install -r requirements_mirror.yml -f -i
 if [ "$?" != 0 ]; then
         $loggercmd "error: installing ansible requirements rc=$?"
@@ -81,7 +84,7 @@ if [ "$?" != 0 ]; then
         $loggercmd "error: curling http://{{ pull_install_ip }}/hosts rc=$?"
 fi
 
-# customizable random delay in seconds, fgci-ansible/local.yml playbook, master branch and /root/hosts inventory file
+# run the fgci-ansible/local.yml playbook, master branch and /root/hosts inventory file
 /usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts
 $loggercmd "info: ansible-pull -U https://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$?"
 
