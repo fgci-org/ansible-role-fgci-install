@@ -36,7 +36,11 @@
   when: ansible_virtualization_type != "docker"
 
 - name: synchronize host_vars for ansible-pull
-  synchronize: src="{{ host_vars_src }}" dest="{{ host_vars_dest }}" owner=no group=no
+  synchronize: 
+                src: "{{ host_vars_src }}" 
+                dest: "{{ host_vars_dest }}" 
+                owner: no 
+                group: no
   when: ansible_virtualization_type != "docker"
 
 - name: template the ansible-pull-script.sh to /var/www/html - for ansible-pull
