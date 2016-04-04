@@ -11,6 +11,9 @@ hosts_file_dest: "/var/www/html/hosts"
 group_vars_src: "group_vars/"
 group_vars_dest: "/var/www/html/group_vars"
 
+host_vars_src: "host_vars/"
+host_vars_dest: "/var/www/html/host_vars"
+
 ansible_pull_sleep: "30"
 ansible_pull_branch: "production"
 
