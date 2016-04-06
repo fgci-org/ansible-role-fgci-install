@@ -19,6 +19,11 @@
 - name: copy hosts file to /var/www/html/hosts.yml - for ansible-pull
   copy: src={{ hosts_file_src }} dest={{ hosts_file_dest }} mode=0644 backup=yes
 
+- name: stat host_vars_src directory
+  stat: path="{{ host_vars_src }}"
+  register: reg_host_vars_src
+  delegate_to: localhost
+
 - name: synchronize group_vars/ to /var/www/html/group_vars/ - for ansible-pull - secrets and firewalls are not needed
   synchronize:
                 src: "{{ group_vars_src }}"
@@ -35,13 +40,13 @@
                  - '--exclude=trusted_networks.yml'
   when: ansible_virtualization_type != "docker"
 
-- name: synchronize host_vars for ansible-pull
+- name: synchronize host_vars for ansible-pull if the directory exsts
   synchronize: 
                 src: "{{ host_vars_src }}" 
                 dest: "{{ host_vars_dest }}" 
                 owner: no 
                 group: no
-  when: ansible_virtualization_type != "docker"
+  when: ansible_virtualization_type != "docker" and reg_host_vars_src.stat.exists
 
 - name: template the ansible-pull-script.sh to /var/www/html - for ansible-pull
   template: src=ansible-pull-script.sh.j2 dest=/var/www/html/ansible-pull-script.sh mode=0644 backup=yes
