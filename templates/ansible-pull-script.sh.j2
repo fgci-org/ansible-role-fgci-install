@@ -92,12 +92,16 @@ fi
 pull_exit=$?
 $loggercmd "info: ansible-pull -U https://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts exited with rc=$pull_exit"
 
+{% if ansible_pull_grafana_annotation is defined %}
+{% if ansible_pull_grafana_annotation == true %}
 # Send a notification to cassini.fgci.csc.fi
 if [ "$pull_exit" == 0 ]; then
   /bin/bash /root/.ansible/pull/$SHOSTNAME/tools/grafana_ansible_pull.sh succeeded
 else
   /bin/bash /root/.ansible/pull/$SHOSTNAME/tools/grafana_ansible_pull.sh failed
 fi
+{% endif %}
+{% endif %}
 
 # Remove lockdir when we are done but before we update ourselves.
 rmdir $lockdir

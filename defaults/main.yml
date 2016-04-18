@@ -27,3 +27,6 @@ fgci_node_type: "{{ slurm_type | default('compute') }}"
 # ansible-role-gitmirror
 gitmirror_config: "/etc/gitmirror.toml"
 gitmirror_basepath: "/var/local/gitmirror"
+
+# Set to False to disable the grafana annotations
+ansible_pull_grafana_annotation: True
