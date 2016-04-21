@@ -40,8 +40,11 @@ if ! mkdir "$lockdir"; then
 fi
 ##
 
-# Bring Up Ib0
-/usr/sbin/ifup ib0
+# Bring Up Ib0 if config file exists
+if [ -f /etc/sysconfig/network-scripts/ifcfg-ib0 ]
+then
+	/usr/sbin/ifup ib0
+fi
 
 # Sleep a bit
 /bin/sleep "$time"s
