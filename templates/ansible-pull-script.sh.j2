@@ -40,8 +40,8 @@ if ! mkdir "$lockdir"; then
 fi
 ##
 
-# Bring Up Ib0 if config file exists
-if [ -f /etc/sysconfig/network-scripts/ifcfg-ib0 ]
+# Bring Up Ib0 if config file exists and is down
+if [ -f /etc/sysconfig/network-scripts/ifcfg-ib0 ] && grep -q "down" /sys/class/net/ib0/operstate
 then
 	/usr/sbin/ifup ib0
 fi
