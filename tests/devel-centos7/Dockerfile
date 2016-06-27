@@ -11,6 +11,7 @@ RUN yum clean all && \
     yum -y install libffi-devel openssl-devel && \
     yum -y install python-devel MySQL-python sshpass && \
     yum -y install acl sudo && \
+    yum -y install dbus-devel dbus-python-devel dbus dbus-glib dbus-glib-devel && \
     sed -i -e 's/^Defaults.*requiretty/Defaults    !requiretty/' -e 's/^%wheel.*ALL$/%wheel    ALL=(ALL)    NOPASSWD: ALL/' /etc/sudoers && \
     yum -y install PyYAML python-jinja2 python-httplib2 python-keyczar python-paramiko python-setuptools git python-pip && \
     pip install --upgrade pip && \
