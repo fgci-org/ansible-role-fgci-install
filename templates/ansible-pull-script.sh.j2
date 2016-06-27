@@ -91,9 +91,9 @@ if [ "$?" != 0 ]; then
 fi
 
 # run the fgci-ansible/local.yml playbook, master/devel branch and /root/hosts inventory file
-/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full
+/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full -o
 pull_exit=$?
-$loggercmd "info: ansible-pull -U https://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full exited with rc=$pull_exit"
+$loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full -o exited with rc=$pull_exit"
 
 {% if ansible_pull_grafana_annotation is defined %}
 {% if ansible_pull_grafana_annotation == true %}
