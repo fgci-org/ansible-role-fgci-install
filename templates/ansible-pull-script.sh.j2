@@ -47,6 +47,7 @@ then
 fi
 
 # Sleep a bit
+$loggercmd "Sleeping for ${time}s until $(date -d @$(($(date +%s) + $time)))"
 /bin/sleep "$time"s
 
 # Clone or update the fgci-ansible repo
