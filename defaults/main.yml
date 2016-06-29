@@ -20,9 +20,6 @@ ansible_pull_branch: "production"
 int_gateway: "10.1.1.4"
 pull_install_ip: "10.1.1.2"
 
-# Set fgci_node_type to service or compute. Default to compute if nothing is set.
-fgci_node_type: "{{ slurm_type | default('compute') }}"
-
 # The following defaults should be kept in sync with the defaults from
 # ansible-role-gitmirror
 gitmirror_config: "/etc/gitmirror.toml"

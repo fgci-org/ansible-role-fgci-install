@@ -3,8 +3,8 @@
 #
 # service.yml - the node that runs dhcpd
  - include: service.yml
-   when: fgci_node_type == "service"
+   when: "'slurm_service' in group_names"
 
 # compute.yml - the node that runs ansible-pull
  - include: compute.yml
-   when: fgci_node_type == "compute"
+   when: "'slurm_compute' in group_names"
