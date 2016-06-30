@@ -54,10 +54,15 @@ $loggercmd "Sleeping for ${time}s until $(date -d @$(($(date +%s) + $time)))"
 #if $WORKDIR/.git does not exist we need to do a git clone ourselves.
 #ansible-pull / git can't do this with a non-empty directory, which we have because we need to wget mirror in the group_vars from each cluster's install node before we run ansible-pull.
 if [ ! -d "$FULL_WORKDIR/.git" ]; then
-    /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR
-if [ "$?" != 0 ]; then
-        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR' PWD=$PWD rc=$?"
-fi
+    	/usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR
+	if [ "$?" != 0 ]; then
+        	$loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR' PWD=$PWD rc=$?"
+	fi
+else
+	/usr/bin/git pull		
+	if [ "$?" != 0 ]; then		
+        	$loggercmd "error: git pull in PWD=$PWD rc=$?"		
+	fi
 fi
 
 # Mirror in the group_vars - they are copied to install node's www with the fgci-install tag and role for install node.
