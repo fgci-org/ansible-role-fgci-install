@@ -14,6 +14,7 @@ export no_proxy="localhost,{{ pull_install_ip }},raw.githubusercontent.com"
 time=$[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]
 lockdir="/var/lock/ansible-pull"
 WORKDIR="workdir"
+FULL_WORKDIR="/root/.ansible/pull/workdir"
 
 # Command line option handling. Only -n (= no sleep, useful for
 # interactive use) is supported so far.
@@ -50,21 +51,12 @@ fi
 $loggercmd "Sleeping for ${time}s until $(date -d @$(($(date +%s) + $time)))"
 /bin/sleep "$time"s
 
-# Clone or update the fgci-ansible repo
-git config --get remote.origin.url |grep {{ pull_install_ip }} >/dev/null
+#if $WORKDIR/.git does not exist we need to do a git clone ourselves.
+#ansible-pull / git can't do this with a non-empty directory, which we have because we need to wget mirror in the group_vars from each cluster's install node before we run ansible-pull.
+if [ ! -d "$FULL_WORKDIR/.git" ]; then
+    /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR
 if [ "$?" != 0 ]; then
-    cd ..
-    rm -rf $WORKDIR
-    /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $WORKDIR
-if [ "$?" != 0 ]; then
-        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $WORKDIR' PWD=$PWD rc=$?"
-fi
-    cd $WORKDIR
-else
-# If the .git directory exists then only run git pull
-/usr/bin/git pull
-if [ "$?" != 0 ]; then
-        $loggercmd "error: git pull in PWD=$PWD rc=$?"
+        $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR' PWD=$PWD rc=$?"
 fi
 fi
 
