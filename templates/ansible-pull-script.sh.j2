@@ -15,7 +15,6 @@ time=$[ ( $RANDOM % {{ ansible_pull_sleep }} )  + 1 ]
 lockdir="/var/lock/ansible-pull"
 WORKDIR="workdir"
 FULL_WORKDIR="/root/.ansible/pull/workdir"
-ONLY_IF_CHANGED="-o"
 
 # Command line option handling. Only -n (= no sleep, useful for
 # interactive use) is supported so far.
@@ -56,7 +55,6 @@ $loggercmd "Sleeping for ${time}s until $(date -d @$(($(date +%s) + $time)))"
 #ansible-pull / git can't do this with a non-empty directory, which we have because we need to wget mirror in the group_vars from each cluster's install node before we run ansible-pull.
 if [ ! -d "$FULL_WORKDIR/.git" ]; then
     /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR
-    ONLY_IF_CHANGED=""
 if [ "$?" != 0 ]; then
         $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR' PWD=$PWD rc=$?"
 fi
@@ -86,9 +84,9 @@ if [ "$?" != 0 ]; then
 fi
 
 # run the fgci-ansible/local.yml playbook, master/devel branch and /root/hosts inventory file
-/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full $ONLY_IF_CHANGED
+/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full
 pull_exit=$?
-$loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full $ONLY_IF_CHANGED exited with rc=$pull_exit"
+$loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full exited with rc=$pull_exit"
 
 {% if ansible_pull_grafana_annotation is defined %}
 {% if ansible_pull_grafana_annotation == true %}
