@@ -41,6 +41,17 @@ if ! mkdir "$lockdir"; then
 fi
 ##
 
+# Setup the cleanup trap
+sleep_pid=
+
+function cleanup {
+    [[ $sleep_pid ]] && disown $sleep_pid && kill $sleep_pid
+    rmdir $lockdir
+}
+
+trap cleanup EXIT
+
+
 # Bring Up Ib0 if config file exists and is down
 if [ -f /etc/sysconfig/network-scripts/ifcfg-ib0 ] && grep -q "down" /sys/class/net/ib0/operstate
 then
@@ -49,7 +60,11 @@ fi
 
 # Sleep a bit
 $loggercmd "Sleeping for ${time}s until $(date -d @$(($(date +%s) + $time)))"
-/bin/sleep "$time"s
+# The sleep &, wait is to have the sleep interruptible so that the
+# cleanup handler runs if the script is exited during the sleep
+/bin/sleep "$time"s & sleep_pid=$!
+wait
+sleep_pid=
 
 #if $FULL_WORKDIR/.git does not exist we need to do a git clone ourselves.
 #ansible-pull / git can't do this with a non-empty directory, which we have because we need to wget mirror in the group_vars from each cluster's install node before we run ansible-pull.
@@ -103,9 +118,6 @@ else
 fi
 {% endif %}
 {% endif %}
-
-# Remove lockdir when we are done but before we update ourselves.
-rmdir $lockdir
 
 # Grab the latest ansible-pull-script.sh
 /usr/bin/curl -f -o /usr/local/bin/ansible-pull-script.sh http://{{ pull_install_ip }}/ansible-pull-script.sh
