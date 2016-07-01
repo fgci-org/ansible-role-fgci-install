@@ -120,8 +120,10 @@ fi
 {% endif %}
 
 # Grab the latest ansible-pull-script.sh
-/usr/bin/curl -f -o /usr/local/bin/ansible-pull-script.sh http://{{ pull_install_ip }}/ansible-pull-script.sh
+/usr/bin/curl -f -o /usr/local/bin/ansible-pull-script.sh.new http://{{ pull_install_ip }}/ansible-pull-script.sh
 if [ "$?" != 0 ]; then
-        $loggercmd "error: curl -f -o /usr/local/bin/ansible-pull-script.sh http://{{ pull_install_ip }}/ansible-pull-script.sh failed with rc=$?"
+    $loggercmd "error: curl -f -o /usr/local/bin/ansible-pull-script.sh.new http://{{ pull_install_ip }}/ansible-pull-script.sh failed with rc=$?"
+else
+    mv /usr/local/bin/ansible-pull-script.sh.new /usr/local/bin/ansible-pull-script.sh
+    chmod 0750 /usr/local/bin/ansible-pull-script.sh
 fi
-chmod 0750 /usr/local/bin/ansible-pull-script.sh
