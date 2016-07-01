@@ -31,8 +31,8 @@ done
 
 
 # Setup the ansible-pull fgci work dir
-mkdir -p /root/.ansible/pull/$WORKDIR
-cd /root/.ansible/pull/$WORKDIR
+mkdir -p $FULL_WORKDIR
+cd $FULL_WORKDIR
 
 ## One ansible-pull at a time
 if ! mkdir "$lockdir"; then
@@ -51,7 +51,7 @@ fi
 $loggercmd "Sleeping for ${time}s until $(date -d @$(($(date +%s) + $time)))"
 /bin/sleep "$time"s
 
-#if $WORKDIR/.git does not exist we need to do a git clone ourselves.
+#if $FULL_WORKDIR/.git does not exist we need to do a git clone ourselves.
 #ansible-pull / git can't do this with a non-empty directory, which we have because we need to wget mirror in the group_vars from each cluster's install node before we run ansible-pull.
 if [ ! -d "$FULL_WORKDIR/.git" ]; then
     	/usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR
@@ -89,17 +89,17 @@ if [ "$?" != 0 ]; then
 fi
 
 # run the fgci-ansible/local.yml playbook, master/devel branch and /root/hosts inventory file
-/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full
+/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full
 pull_exit=$?
-$loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d /root/.ansible/pull/$WORKDIR --full exited with rc=$pull_exit"
+$loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full exited with rc=$pull_exit"
 
 {% if ansible_pull_grafana_annotation is defined %}
 {% if ansible_pull_grafana_annotation == true %}
 # Send a notification to cassini.fgci.csc.fi
 if [ "$pull_exit" == 0 ]; then
-  /bin/bash /root/.ansible/pull/$WORKDIR/tools/grafana_ansible_pull.sh succeeded
+  /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh succeeded
 else
-  /bin/bash /root/.ansible/pull/$WORKDIR/tools/grafana_ansible_pull.sh failed
+  /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh failed
 fi
 {% endif %}
 {% endif %}
