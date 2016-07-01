@@ -124,6 +124,6 @@ fi
 if [ "$?" != 0 ]; then
     $loggercmd "error: curl -f -o /usr/local/bin/ansible-pull-script.sh.new http://{{ pull_install_ip }}/ansible-pull-script.sh failed with rc=$?"
 else
+    chmod 0750 /usr/local/bin/ansible-pull-script.sh.new
     mv /usr/local/bin/ansible-pull-script.sh.new /usr/local/bin/ansible-pull-script.sh
-    chmod 0750 /usr/local/bin/ansible-pull-script.sh
 fi
