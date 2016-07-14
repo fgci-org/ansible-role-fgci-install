@@ -7,9 +7,6 @@
 - name: create dhcp.d directory
   file: path=/etc/dhcp/dhcpd.d state=directory
 
-- name: creates nodes.conf file
-  file: path=/etc/dhcp/dhcpd.d/nodes.conf state=touch owner=root mode=0644
-
 - name: create group_vars_dest directory - /var/www/html/group_vars by default
   file: path={{ group_vars_dest }} state=directory
 
