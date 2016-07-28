@@ -35,6 +35,7 @@
                 rsync_opts:
                  - '--exclude=secrets.yml'
                  - '--exclude=trusted_networks.yml'
+                 - '--exclude=*.swp'
   when: ansible_virtualization_type != "docker"
 
 - name: synchronize host_vars for ansible-pull if the directory exsts
