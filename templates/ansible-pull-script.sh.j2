@@ -115,6 +115,10 @@ $loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/C
 # Send a notification to cassini.fgci.csc.fi
 if [ "$pull_exit" == 0 ]; then
   /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh succeeded
+  # The presence of this file indicates that ansible-pull has at least once succeeded on this node.
+  if [ ! -f "/etc/FGCI" ]; then
+    echo "$0 succeeded at: $(date)" >> /etc/FGCI
+  fi
 else
   /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh failed
 fi
