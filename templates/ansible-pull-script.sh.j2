@@ -17,6 +17,10 @@ WORKDIR="workdir"
 FULL_WORKDIR="/root/.ansible/pull/workdir"
 # Make ansible not print skipped hosts
 export DISPLAY_SKIPPED_HOSTS=0
+{% if ansible_pull_log is True %}
+# Make ansible log to a file
+ANSIBLE_LOG_PATH={{ ansible_pull_log_path }}
+{% endif %}
 
 # Command line option handling. Only -n (= no sleep, useful for
 # interactive use) is supported so far.

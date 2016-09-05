@@ -27,3 +27,10 @@ gitmirror_basepath: "/var/local/gitmirror"
 
 # Set to False to disable the grafana annotations
 ansible_pull_grafana_annotation: True
+
+# Logging
+ansible_pull_log: False
+ansible_pull_log_path: "/var/log/ansible-pull.log"
+ansible_pull_logrotate: False
+ansible_pull_logrotate_interval: daily
+ansible_pull_logrotate_rotate: 16
