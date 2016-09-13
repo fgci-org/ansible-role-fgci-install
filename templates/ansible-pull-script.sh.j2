@@ -53,7 +53,6 @@ function cleanup {
 
 trap cleanup EXIT
 
-
 # Bring Up Ib0 if config file exists and is down
 if [ -f /etc/sysconfig/network-scripts/ifcfg-ib0 ] && grep -q "down" /sys/class/net/ib0/operstate
 then
@@ -67,6 +66,8 @@ $loggercmd "Sleeping for ${time}s until $(date -d @$(($(date +%s) + $time)))"
 /bin/sleep "$time"s & sleep_pid=$!
 wait
 sleep_pid=
+
+start_time="$(($(awk '/^now/ {print $3; exit}' /proc/timer_list)/1000000000))"
 
 #if $FULL_WORKDIR/.git does not exist we need to do a git clone ourselves.
 #ansible-pull / git can't do this with a non-empty directory, which we have because we need to wget mirror in the group_vars from each cluster's install node before we run ansible-pull.
@@ -110,17 +111,20 @@ fi
 pull_exit=$?
 $loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full exited with rc=$pull_exit"
 
+end_time="$(($(awk '/^now/ {print $3; exit}' /proc/timer_list)/1000000000))"
+diff_time="$(($end_time - $start_time))"
+
 {% if ansible_pull_grafana_annotation is defined %}
 {% if ansible_pull_grafana_annotation == true %}
 # Send a notification to cassini.fgci.csc.fi
 if [ "$pull_exit" == 0 ]; then
-  /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh succeeded $SECONDS
+  /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh succeeded $diff_time
   # The presence of this file indicates that ansible-pull has at least once succeeded on this node.
   if [ ! -f "/etc/FGCI" ]; then
     echo "$0 succeeded at: $(date)" >> /etc/FGCI
   fi
 else
-  /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh failed $SECONDS
+  /bin/bash $FULL_WORKDIR/tools/grafana_ansible_pull.sh failed $diff_time
 fi
 {% endif %}
 {% endif %}
