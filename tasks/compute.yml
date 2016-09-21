@@ -2,9 +2,6 @@
 # tasks file for ansible-role-fgci-install
 #
 
-- name: template the ansible-pull-script.sh to /usr/local/bin
-  template: src=ansible-pull-script.sh.j2 dest=/usr/local/bin/ansible-pull-script.sh mode=0755 backup=no
-
 - name: template the ansible_pull_logrotate.j2 to /etc/logrotate.d/ansible_pull
   template: src=ansible_pull_logrotate.j2 dest=/etc/logrotate.d/ansible_pull mode=0644 backup=no
   when: ansible_pull_log and ansible_pull_logrotate
