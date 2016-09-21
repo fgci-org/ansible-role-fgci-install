@@ -1,5 +1,5 @@
 # {{ ansible_managed }}
-{% if ansible_pull_logrotate is True %}
+{% if ansible_pull_logrotate == true %}
 {{ ansible_pull_log_path }} {
 	{{ ansible_pull_logrotate_interval }}
 	missingok
