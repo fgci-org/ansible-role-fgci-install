@@ -1,0 +1,13 @@
+# {{ ansible_managed }}
+{% if ansible_pull_logrotate is True %}
+{{ ansible_pull_log_path }} {
+	{{ ansible_pull_logrotate_interval }}
+	missingok
+	notifempty
+	rotate {{ ansible_pull_logrotate_rotate }}
+	copytruncate
+	compress
+	delaycompress
+	create 640 root root
+}
+{% endif %}
