@@ -1,0 +1,15 @@
+# {{ ansible_managed }}
+[Unit]
+Description=Run ansible-pull-script.sh on boot
+After=network.target
+Before=slurm.service
+DefaultDependencies=no
+Conflicts=shutdown.target
+
+[Service]
+ExecStart="/usr/local/bin/ansible-pull-script.sh -n >/var/log/ansible.boot.log 2>&1"
+Type={{ ansible_pull_systemd_type }}
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target

@@ -34,3 +34,8 @@ ansible_pull_log_path: "/var/log/ansible-pull.log"
 ansible_pull_logrotate: False
 ansible_pull_logrotate_interval: daily
 ansible_pull_logrotate_rotate: 16
+
+# systemd service
+# oneshot - other services wait for this task to complete before starting
+# simple - launch the process and then wait
+ansible_pull_systemd_type: "oneshot"
