@@ -92,7 +92,7 @@ fi
 /usr/bin/wget --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
 
 # Mirror the host_vars tree
-/usr/bin/wget --no-host-directories --no-parent --mirror http://{{ pull_install_ip }}/host_vars
+/usr/bin/wget --no-host-directories --no-parent --mirror --accept=yml http://{{ pull_install_ip }}/host_vars
 
 # Install all the ansible role dependencies
 /usr/bin/curl -f -O http://{{ pull_install_ip }}/requirements_mirror.yml
