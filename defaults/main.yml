@@ -35,6 +35,9 @@ ansible_pull_logrotate: False
 ansible_pull_logrotate_interval: daily
 ansible_pull_logrotate_rotate: 16
 
-# systemd service
+# running ansible-pull as a systemd service is not enabled by default
+ansible_pull_systemd: False
 ansible_pull_systemd_type: "oneshot"
 ansible_pull_systemd_execstart: "/bin/bash -c '/usr/local/bin/ansible-pull-script.sh -n >/var/log/ansible.boot.log 2>&1'"
+# example value where the logs are in systemd's journal instead of a file
+#ansible_pull_systemd_execstart: "/usr/local/bin/ansible-pull-script.sh -n"
