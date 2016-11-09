@@ -7,7 +7,7 @@ DefaultDependencies=no
 Conflicts=shutdown.target
 
 [Service]
-ExecStart="/usr/local/bin/ansible-pull-script.sh -n >/var/log/ansible.boot.log 2>&1"
+ExecStart={{ ansible_pull_systemd_execstart }}
 Type={{ ansible_pull_systemd_type }}
 RemainAfterExit=yes
 
