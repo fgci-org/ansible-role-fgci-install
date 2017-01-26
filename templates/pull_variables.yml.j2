@@ -4,3 +4,7 @@
 #
 running_as_ansible_pull: True
 slurm_munge_key_from_nfs: True
+
+# This is needed if adminMailAddr is is secrets.yml
+# which is not synced in ansible-pull-script.sh
+adminMailAddr: "{{ adminMailAddr }}"
