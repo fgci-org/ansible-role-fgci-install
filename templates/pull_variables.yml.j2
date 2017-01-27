@@ -9,7 +9,10 @@ slurm_munge_key_from_nfs: True
 # which is not synced in ansible-pull-script.sh
 adminMailAddr: "{{ adminMailAddr }}"
 
-# These are needed in here as the addresses are populated from ansible host_vars facts, 
+# These are needed in here as the addresses are populated from ansible hostvars facts,
 # which aren't available from other hosts when running ansible-pull
-ntp_config_server: [ "{{ hostvars[groups['install'][0]]['ansible_hostname'] }}", "{{ hostvars[groups['admin'][0]]['ansible_hostname'] }}" ]
+# When this file is templated the play needs to gather facts from all groups it uses hostvars from.
+# fgci-ansible doesn't have admin group in the plays in install.yml so using central_log_host
+#  to point to the admin node.
+ntp_config_server: [ "{{ hostvars[groups['install'][0]]['ansible_hostname'] }}", "{{ central_log_host|replace('@','') }}" ]
 slurm_service_node: "{{ hostvars[groups['slurm_service'][0]]['ansible_hostname']  }}"
