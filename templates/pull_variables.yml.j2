@@ -8,3 +8,8 @@ slurm_munge_key_from_nfs: True
 # This is needed if adminMailAddr is is secrets.yml
 # which is not synced in ansible-pull-script.sh
 adminMailAddr: "{{ adminMailAddr }}"
+
+# These are needed in here as the addresses are populated from ansible facts, 
+# which aren't available when running ansible-pull
+ntp_config_server: [ "{{ kickstart_server_ip }}", "{{ central_log_host|replace('@', '') }}" ]
+slurm_service_node: "{{ hostvars[groups['slurm_service'][0]]['ansible_hostname']  }}"
