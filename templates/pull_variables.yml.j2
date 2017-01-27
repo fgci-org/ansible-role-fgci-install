@@ -2,14 +2,9 @@
 # variables for ansible-pull
 # 
 #
-pull_install_ip: "{{ kickstart_server_ip }}"
-pull_login_ip: "{{ int_gateway }}"
 running_as_ansible_pull: True
-
-{% raw %}
-ntp_config_server: [ "{{ kickstart_server_ip }}", "10.1.1.1" ]
-collectd_network_server_host: "{{ kickstart_server_ip }}" 
-{% endraw %}
-adminMailAddr: "{{ adminMailAddr }}"
-slurm_service_node: "{{ hostvars[groups['slurm_service'][0]]['ansible_hostname']  }}"
 slurm_munge_key_from_nfs: True
+
+# This is needed if adminMailAddr is is secrets.yml
+# which is not synced in ansible-pull-script.sh
+adminMailAddr: "{{ adminMailAddr }}"
