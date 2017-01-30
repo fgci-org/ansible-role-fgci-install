@@ -27,6 +27,7 @@
                 dest: "{{ group_vars_dest }}"
                 archive: no
                 recursive: yes
+                delete: yes
                 times: no
                 set_remote_user: yes
                 perms: no
@@ -45,6 +46,11 @@
                 dest: "{{ host_vars_dest }}" 
                 owner: no 
                 group: no
+                delete: yes
+                rsync_opts:
+                  - '--exclude=*.swp'
+                  - '--exclude=*~'
+
   when: ansible_virtualization_type != "docker" and reg_host_vars_src.stat.exists
 
 - name: template the ansible-pull-script.sh to /var/www/html - for ansible-pull
