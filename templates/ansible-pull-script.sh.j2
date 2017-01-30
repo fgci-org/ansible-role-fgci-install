@@ -74,7 +74,7 @@ sleep_pid=
 start_time="$(($(awk '/^now/ {print $3; exit}' /proc/timer_list)/1000000000))"
 
 #if $FULL_WORKDIR/.git does not exist we need to do a git clone ourselves.
-#ansible-pull / git can't do this with a non-empty directory, which we have because we need to wget mirror in the group_vars from each cluster's install node before we run ansible-pull.
+#ansible-pull / git can't do this with a non-empty directory, which we have because we need to rsync mirror in the group_vars from each cluster's install node before we run ansible-pull.
 if [ ! -d "$FULL_WORKDIR/.git" ]; then
     	/usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR
 	if [ "$?" != 0 ]; then
@@ -88,11 +88,11 @@ else
 fi
 
 # Mirror in the group_vars - they are copied to install node's www with the fgci-install tag and role for install node.
-# Wget assumes we are in $HOME/.ansible/pull/$WORKDIR when running
-/usr/bin/wget --no-host-directories --mirror --accept=example,yml,fgci-default-packages http://{{ pull_install_ip }}/group_vars
+# rsync assumes we are in $HOME/.ansible/pull/$WORKDIR when running
+/usr/bin/rsync -avzH --delete --delay-updates rsync://{{ pull_install_ip }}/group_vars group_vars
 
 # Mirror the host_vars tree
-/usr/bin/wget --no-host-directories --no-parent --mirror --accept=yml http://{{ pull_install_ip }}/host_vars
+/usr/bin/rsync -avzH --delete --delay-updates rsync://{{ pull_install_ip }}/host_vars host_vars
 
 # Install all the ansible role dependencies
 /usr/bin/curl -f -O http://{{ pull_install_ip }}/requirements_mirror.yml

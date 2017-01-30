@@ -68,3 +68,10 @@
 - name: Bounce gitmirror service, but do not fail if it does not exist yet
   service: name=gitmirror state=restarted
   ignore_errors: yes
+
+- name: Generate rsyncd.conf
+  template: src=rsyncd.conf.j2 dest=/etc/rsyncd.conf mode=0644
+  notify: restart rsyncd
+
+- name: Enable rsyncd
+  service: name=rsyncd state=started enabled=yes
