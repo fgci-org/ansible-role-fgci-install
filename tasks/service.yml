@@ -36,6 +36,7 @@
                  - '--exclude=secrets.yml'
                  - '--exclude=trusted_networks.yml'
                  - '--exclude=*.swp'
+                 - '--exclude=*~'
   when: ansible_virtualization_type != "docker"
 
 - name: synchronize host_vars for ansible-pull if the directory exsts
