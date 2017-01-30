@@ -89,10 +89,10 @@ fi
 
 # Mirror in the group_vars - they are copied to install node's www with the fgci-install tag and role for install node.
 # rsync assumes we are in $HOME/.ansible/pull/$WORKDIR when running
-/usr/bin/rsync -avzH --delete --delay-updates rsync://{{ pull_install_ip }}/group_vars group_vars
+/usr/bin/rsync -aqzH --delete --delay-updates rsync://{{ pull_install_ip }}/group_vars group_vars
 
 # Mirror the host_vars tree
-/usr/bin/rsync -avzH --delete --delay-updates rsync://{{ pull_install_ip }}/host_vars host_vars
+/usr/bin/rsync -aqzH --delete --delay-updates rsync://{{ pull_install_ip }}/host_vars host_vars
 
 # Install all the ansible role dependencies
 /usr/bin/curl -f -O http://{{ pull_install_ip }}/requirements_mirror.yml
