@@ -10,6 +10,9 @@
 - name: create group_vars_dest directory - /var/www/html/group_vars by default
   file: path={{ group_vars_dest }} state=directory
 
+- name: create host_vars_dest directory - /var/www/html/host_vars by default
+  file: path={{ host_vars_dest }} state=directory
+
 - name: template in /var/www/html/pull_variables.yml
   template: src=pull_variables.yml.j2 dest=/var/www/html/pull_variables.yml mode=0644 backup=yes
 
