@@ -50,6 +50,13 @@
 
   when: ansible_virtualization_type != "docker" and reg_host_vars_src.stat.exists
 
+- name: Generate rsyncd.conf
+  template: src=rsyncd.conf.j2 dest=/etc/rsyncd.conf mode=0644
+  notify: restart rsyncd
+
+- name: Enable rsyncd
+  service: name=rsyncd state=started enabled=yes
+
 - name: template the ansible-pull-script.sh to /var/www/html - for ansible-pull
   template: src=ansible-pull-script.sh.j2 dest=/var/www/html/ansible-pull-script.sh mode=0644 backup=yes
   when: ansible_virtualization_type != "docker"
