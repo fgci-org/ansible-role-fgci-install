@@ -76,10 +76,10 @@ start_time="$(($(awk '/^now/ {print $3; exit}' /proc/timer_list)/1000000000))"
 #if $FULL_WORKDIR/.git does not exist we need to do a git clone ourselves.
 #ansible-pull / git can't do this with a non-empty directory, which we have because we need to rsync mirror in the group_vars from each cluster's install node before we run ansible-pull.
 if [ ! -d "$FULL_WORKDIR/.git" ]; then
-    	/usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR
-	if [ "$?" != 0 ]; then
-        	$loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git $FULL_WORKDIR' PWD=$PWD rc=$?"
-	fi
+        /usr/bin/git clone http://{{ pull_install_ip }}:8080/github.com/CSCfi/fgci-ansible.git $FULL_WORKDIR
+        if [ "$?" != 0 ]; then
+            $loggercmd "error: with 'git clone http://{{ pull_install_ip }}:8080/github.com/CSCfi/fgci-ansible.git $FULL_WORKDIR' PWD=$PWD rc=$?"
+        fi
 else
 	/usr/bin/git pull		
 	if [ "$?" != 0 ]; then		
@@ -117,9 +117,9 @@ if [ "$?" != 0 ]; then
 fi
 
 # run the fgci-ansible/local.yml playbook, master/devel branch and /root/hosts inventory file
-/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full
+/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSCfi/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full
 pull_exit=$?
-$loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSC-IT-Center-for-Science/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full exited with rc=$pull_exit"
+$loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/CSCfi/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full exited with rc=$pull_exit"
 
 end_time="$(($(awk '/^now/ {print $3; exit}' /proc/timer_list)/1000000000))"
 diff_time="$(($end_time - $start_time))"
