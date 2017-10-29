@@ -2,9 +2,9 @@
 # tasks file for ansible-role-fgci-install
 #
 # service.yml - the node that runs dhcpd
- - include: service.yml
+ - include_tasks: service.yml
    when: "'slurm_service' in group_names"
 
 # compute.yml - the node that runs ansible-pull
- - include: compute.yml
+ - include_tasks: compute.yml
    when: "'slurm_compute' in group_names"
