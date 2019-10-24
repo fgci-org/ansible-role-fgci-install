@@ -16,7 +16,7 @@ lockdir="/var/lock/ansible-pull"
 WORKDIR="workdir"
 FULL_WORKDIR="/root/.ansible/pull/workdir"
 # Make ansible not print skipped hosts
-export DISPLAY_SKIPPED_HOSTS=0
+export ANSIBLE_DISPLAY_SKIPPED_HOSTS=0
 {% if ansible_pull_log == true %}
 # Make ansible log to a file
 export ANSIBLE_LOG_PATH={{ ansible_pull_log_path }}
