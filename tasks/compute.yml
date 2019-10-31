@@ -3,13 +3,25 @@
 #
 
 - name: template in ansible_pull.service systemd script
-  template: src=ansible_pull.service.j2 dest=/etc/systemd/system/ansible_pull.service owner=root group=root mode=0644 backup=no
+  template:
+      src: ansible_pull.service.j2
+      dest: /etc/systemd/system/ansible_pull.service
+      owner: root
+      group: root
+      mode: 0644
+      backup: no
   when: ansible_pull_systemd|bool
 
 - name: Enable the ansible_pull service
-  service: name=ansible_pull enabled=yes
+  service: 
+      name: ansible_pull
+      enabled: yes
   when: ansible_pull_systemd|bool
 
 - name: template the ansible_pull_logrotate.j2 to /etc/logrotate.d/ansible_pull
-  template: src=ansible_pull_logrotate.j2 dest=/etc/logrotate.d/ansible_pull mode=0644 backup=no
+  template:
+      src: ansible_pull_logrotate.j2
+      dest: /etc/logrotate.d/ansible_pull
+      mode: 0644
+      backup: no
   when: ansible_pull_log|bool and ansible_pull_logrotate|bool
