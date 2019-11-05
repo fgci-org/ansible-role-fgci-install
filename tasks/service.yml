@@ -2,25 +2,42 @@
 # tasks file for ansible-role-fgci-install
 #
 - name: install EPEL
-  yum: name=epel-release state=present
+  yum: 
+    name: epel-release
+    state: present
 
 - name: create dhcp.d directory
-  file: path=/etc/dhcp/dhcpd.d state=directory
+  file: 
+     path: /etc/dhcp/dhcpd.d
+     state: directory
 
 - name: create group_vars_dest directory - /var/www/html/group_vars by default
-  file: path={{ group_vars_dest }} state=directory
+  file: 
+     path: "{{ group_vars_dest }}"
+     state: directory
 
 - name: create host_vars_dest directory - /var/www/html/host_vars by default
-  file: path={{ host_vars_dest }} state=directory
+  file: 
+     path: "{{ host_vars_dest }}"
+     state: directory
 
 - name: template in /var/www/html/pull_variables.yml
-  template: src=pull_variables.yml.j2 dest=/var/www/html/pull_variables.yml mode=0644 backup=yes
+  template: 
+      src: pull_variables.yml.j2
+      dest: /var/www/html/pull_variables.yml
+      mode: 0644
+      backup: yes
 
 - name: copy hosts file to /var/www/html/hosts.yml - for ansible-pull
-  copy: src={{ hosts_file_src }} dest={{ hosts_file_dest }} mode=0644 backup=yes
+  copy: 
+     src: "{{ hosts_file_src }}" 
+     dest: "{{ hosts_file_dest }}" 
+     mode: 0644
+     backup: yes
 
 - name: stat host_vars_src directory
-  stat: path="{{ host_vars_src }}"
+  stat: 
+     path: "{{ host_vars_src }}"
   register: reg_host_vars_src
   delegate_to: localhost
 
@@ -50,35 +67,57 @@
                 rsync_opts:
                   - '--exclude=*.swp'
                   - '--exclude=*~'
-
   when: ansible_virtualization_type != "docker" and reg_host_vars_src.stat.exists
 
 - name: Generate rsyncd.conf
-  template: src=rsyncd.conf.j2 dest=/etc/rsyncd.conf mode=0644
+  template: 
+     src: rsyncd.conf.j2
+     dest: /etc/rsyncd.conf
+     mode: 0644
   notify: restart rsyncd
 
 - name: Enable rsyncd
-  service: name=rsyncd state=started enabled=yes
+  service: 
+     name: rsyncd
+     state: started
+     enabled: yes
 
 - name: template the ansible-pull-script.sh to /var/www/html - for ansible-pull
-  template: src=ansible-pull-script.sh.j2 dest=/var/www/html/ansible-pull-script.sh mode=0644 backup=yes
+  template:
+     src: ansible-pull-script.sh.j2
+     dest: /var/www/html/ansible-pull-script.sh
+     mode: 0644
+     backup: yes
   when: ansible_virtualization_type != "docker"
 
 - name: copy in reinstall script
-  copy: src=reinstall dest=/usr/local/sbin/reinstall mode=0755 owner=root group=root backup=no
+  copy: 
+    src: reinstall
+    dest: /usr/local/sbin/reinstall
+    mode: 0755
+    owner: root
+    group: root
+    backup: no
 
 - name: Copy requirements.yml
-  copy: src={{ playbook_dir }}/requirements.yml dest=/tmp/requirements.yml
+  copy: 
+     src: "{{ playbook_dir }}/requirements.yml"
+     dest: /tmp/requirements.yml
 
 - name: Copy gitmirror config generation tool
-  copy: src={{ playbook_dir }}/tools/gitmirror_conf_generate.py dest=/tmp/gitmirror_conf_generate.py
+  copy:
+    src: "{{ playbook_dir }}/tools/gitmirror_conf_generate.py"
+    dest: /tmp/gitmirror_conf_generate.py
 
 - name: Make sure PyYAML is installed
   yum: name=PyYAML
+    state: present
 
 - name: Run gitmirror config generation tool
   command: python /tmp/gitmirror_conf_generate.py /tmp/requirements.yml {{ pull_install_ip }} /var/www/html/requirements_mirror.yml {{ gitmirror_config }} {{ gitmirror_basepath }}
 
 - name: Bounce gitmirror service, but do not fail if it does not exist yet
-  service: name=gitmirror state=restarted
+  service:
+     name: gitmirror
+     state: restarted
   ignore_errors: yes
