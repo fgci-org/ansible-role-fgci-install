@@ -110,7 +110,8 @@
     dest: /tmp/gitmirror_conf_generate.py
 
 - name: Make sure PyYAML is installed
-  yum: name=PyYAML
+  package:
+    name: PyYAML
     state: present
 
 - name: Run gitmirror config generation tool
