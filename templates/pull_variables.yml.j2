@@ -14,5 +14,5 @@ adminMailAddr: "{{ adminMailAddr }}"
 # When this file is templated the play needs to gather facts from all groups it uses hostvars from.
 # fgci-ansible doesn't have admin group in the plays in install.yml so using central_log_host
 #  to point to the admin node.
-ntp_config_server: [ "{{ hostvars[groups['install'][0]]['ansible_hostname'] }}", "{{ central_log_host|replace('@','') }}" ]
+ntp_config_server: [ "{{ hostvars[groups['install'][0]]['int_ip_addr'] }}", "{{ hostvars[groups['admin'][0]]['int_ip_addr'] }}" ]
 slurm_service_node: "{{ hostvars[groups['slurm_service'][0]]['ansible_hostname']  }}"
