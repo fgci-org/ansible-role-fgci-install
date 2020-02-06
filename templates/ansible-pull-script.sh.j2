@@ -117,7 +117,7 @@ if [ "$?" != 0 ]; then
 fi
 
 # run the fgci-ansible/local.yml playbook, master/devel branch and /root/hosts inventory file
-/usr/bin/ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/fgci-org/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full
+/usr/bin/ansible-pull -T 120 -U http://{{ pull_install_ip }}:8080/github.com/fgci-org/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full
 pull_exit=$?
 $loggercmd "info: ansible-pull -U http://{{ pull_install_ip }}:8080/github.com/fgci-org/fgci-ansible.git -C {{ ansible_pull_branch }} -i /root/hosts -d $FULL_WORKDIR --full exited with rc=$pull_exit"
 
