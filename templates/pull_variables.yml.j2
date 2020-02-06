@@ -15,4 +15,4 @@ adminMailAddr: "{{ adminMailAddr }}"
 # fgci-ansible doesn't have admin group in the plays in install.yml so using central_log_host
 #  to point to the admin node.
 ntp_config_server: [ "{{ hostvars[groups['install'][0]]['int_ip_addr'] }}", "{{ hostvars[groups['admin'][0]]['int_ip_addr'] }}" ]
-slurm_service_node: "{{ hostvars[groups['slurm_service'][0]]['ansible_hostname']  }}"
+slurm_service_node: "{{ groups['slurm_service'][0] }}"
